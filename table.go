@@ -29,43 +29,43 @@ func NewTable[V any](fn KeyFunc[V]) Table[V] {
 	}
 }
 
-func (t Table[V]) IndexString(fn func(V) string) (Table[V], *StringField[V]) {
-	f := &StringField[V]{fn}
+func (t Table[V]) IndexString(fn func(V) string) (Table[V], *StringIndex[V]) {
+	f := &StringIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
 }
 
-func (t Table[V]) IndexInt(fn func(V) int) (Table[V], *IntField[V]) {
-	f := &IntField[V]{fn}
+func (t Table[V]) IndexInt(fn func(V) int) (Table[V], *IntIndex[V]) {
+	f := &IntIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
 }
 
-func (t Table[V]) IndexFloat(fn func(V) float64) (Table[V], *FloatField[V]) {
-	f := &FloatField[V]{fn}
+func (t Table[V]) IndexFloat(fn func(V) float64) (Table[V], *FloatIndex[V]) {
+	f := &FloatIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
 }
 
-func (t Table[V]) IndexBool(fn func(V) bool) (Table[V], *BoolField[V]) {
-	f := &BoolField[V]{fn}
+func (t Table[V]) IndexBool(fn func(V) bool) (Table[V], *BoolIndex[V]) {
+	f := &BoolIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
 }
 
-func (t Table[V]) IndexBinary(fn func(V) []byte) (Table[V], *BinaryField[V]) {
-	f := &BinaryField[V]{fn}
+func (t Table[V]) IndexBinary(fn func(V) []byte) (Table[V], *BinaryIndex[V]) {
+	f := &BinaryIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
 }
 
-func (t Table[V]) IndexMultiple(fn func(V) MultiKey) (Table[V], *MultiField[V]) {
-	f := &MultiField[V]{fn}
+func (t Table[V]) IndexMultiple(fn func(V) CombinedKey) (Table[V], *CombinedIndex[V]) {
+	f := &CombinedIndex[V]{fn}
 	t.idxm = t.idxm.add(f)
 	t = t.registerIndex(f)
 	return t, f
