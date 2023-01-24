@@ -20,155 +20,155 @@ type Field[V any] interface {
 	field()
 }
 
-type StringField[V any] struct {
+type StringIndex[V any] struct {
 	fn func(v V) string
 }
 
-func (f *StringField[V]) Is(v string) *EqualCond[V] {
+func (f *StringIndex[V]) Is(v string) *EqualCond[V] {
 	return &EqualCond[V]{f, StringKey(v)}
 }
 
-func (f *StringField[V]) KeyOf(v V) Key {
+func (f *StringIndex[V]) KeyOf(v V) Key {
 	return StringKey(f.fn(v))
 }
 
-func (f *StringField[V]) LessThan(v string) *LessThanCond[V] {
+func (f *StringIndex[V]) LessThan(v string) *LessThanCond[V] {
 	return &LessThanCond[V]{f, StringKey(v)}
 }
 
-func (f *StringField[V]) LessThanOrEqual(v string) *LessThanOrEqualCond[V] {
+func (f *StringIndex[V]) LessThanOrEqual(v string) *LessThanOrEqualCond[V] {
 	return &LessThanOrEqualCond[V]{f, StringKey(v)}
 }
 
-func (f *StringField[V]) GreaterThan(v string) *GreaterThanCond[V] {
+func (f *StringIndex[V]) GreaterThan(v string) *GreaterThanCond[V] {
 	return &GreaterThanCond[V]{f, StringKey(v)}
 }
 
-func (f *StringField[V]) GreaterThanOrEqual(v string) *GreaterThanOrEqualCond[V] {
+func (f *StringIndex[V]) GreaterThanOrEqual(v string) *GreaterThanOrEqualCond[V] {
 	return &GreaterThanOrEqualCond[V]{f, StringKey(v)}
 }
 
-func (f *StringField[V]) field() {}
+func (f *StringIndex[V]) field() {}
 
-type IntField[V any] struct {
+type IntIndex[V any] struct {
 	fn func(v V) int
 }
 
-func (f *IntField[V]) KeyOf(v V) Key {
+func (f *IntIndex[V]) KeyOf(v V) Key {
 	return IntKey(f.fn(v))
 }
 
-func (f *IntField[V]) field() {}
+func (f *IntIndex[V]) field() {}
 
-func (f *IntField[V]) Is(v int) *EqualCond[V] {
+func (f *IntIndex[V]) Is(v int) *EqualCond[V] {
 	return &EqualCond[V]{f, IntKey(v)}
 }
 
-func (f *IntField[V]) IsLessThan(v int) *LessThanCond[V] {
+func (f *IntIndex[V]) IsLessThan(v int) *LessThanCond[V] {
 	return &LessThanCond[V]{f, IntKey(v)}
 }
 
-func (f *IntField[V]) IsLessThanOrEqual(v int) *LessThanOrEqualCond[V] {
+func (f *IntIndex[V]) IsLessThanOrEqual(v int) *LessThanOrEqualCond[V] {
 	return &LessThanOrEqualCond[V]{f, IntKey(v)}
 }
 
-func (f *IntField[V]) IsGreaterThan(v int) *GreaterThanCond[V] {
+func (f *IntIndex[V]) IsGreaterThan(v int) *GreaterThanCond[V] {
 	return &GreaterThanCond[V]{f, IntKey(v)}
 }
 
-func (f *IntField[V]) IsGreaterThanOrEqual(v int) *GreaterThanOrEqualCond[V] {
+func (f *IntIndex[V]) IsGreaterThanOrEqual(v int) *GreaterThanOrEqualCond[V] {
 	return &GreaterThanOrEqualCond[V]{f, IntKey(v)}
 }
 
-type FloatField[V any] struct {
+type FloatIndex[V any] struct {
 	fn func(v V) float64
 }
 
-func (f *FloatField[V]) KeyOf(v V) Key {
+func (f *FloatIndex[V]) KeyOf(v V) Key {
 	return FloatKey(f.fn(v))
 }
 
-func (f *FloatField[V]) Is(v float64) *EqualCond[V] {
+func (f *FloatIndex[V]) Is(v float64) *EqualCond[V] {
 	return &EqualCond[V]{f, FloatKey(v)}
 }
 
-func (f *FloatField[V]) LessThan(v float64) *LessThanCond[V] {
+func (f *FloatIndex[V]) LessThan(v float64) *LessThanCond[V] {
 	return &LessThanCond[V]{f, FloatKey(v)}
 }
 
-func (f *FloatField[V]) LessThanOrEqual(v float64) *LessThanOrEqualCond[V] {
+func (f *FloatIndex[V]) LessThanOrEqual(v float64) *LessThanOrEqualCond[V] {
 	return &LessThanOrEqualCond[V]{f, FloatKey(v)}
 }
 
-func (f *FloatField[V]) GreaterThan(v float64) *GreaterThanCond[V] {
+func (f *FloatIndex[V]) GreaterThan(v float64) *GreaterThanCond[V] {
 	return &GreaterThanCond[V]{f, FloatKey(v)}
 }
 
-func (f *FloatField[V]) GreaterThanOrEqual(v float64) *GreaterThanOrEqualCond[V] {
+func (f *FloatIndex[V]) GreaterThanOrEqual(v float64) *GreaterThanOrEqualCond[V] {
 	return &GreaterThanOrEqualCond[V]{f, FloatKey(v)}
 }
 
-func (f *FloatField[V]) field() {}
+func (f *FloatIndex[V]) field() {}
 
-type BoolField[V any] struct {
+type BoolIndex[V any] struct {
 	fn func(v V) bool
 }
 
-func (f *BoolField[V]) KeyOf(v V) Key {
+func (f *BoolIndex[V]) KeyOf(v V) Key {
 	return BoolKey(f.fn(v))
 }
 
-func (f *BoolField[V]) IsTrue() *EqualCond[V] {
+func (f *BoolIndex[V]) IsTrue() *EqualCond[V] {
 	return &EqualCond[V]{f, BoolKey(true)}
 }
 
-func (f *BoolField[V]) IsFalse() *EqualCond[V] {
+func (f *BoolIndex[V]) IsFalse() *EqualCond[V] {
 	return &EqualCond[V]{f, BoolKey(false)}
 }
 
-func (f *BoolField[V]) field() {}
+func (f *BoolIndex[V]) field() {}
 
-type BinaryField[V any] struct {
+type BinaryIndex[V any] struct {
 	fn func(v V) []byte
 }
 
-func (f *BinaryField[V]) KeyOf(v V) Key {
+func (f *BinaryIndex[V]) KeyOf(v V) Key {
 	return BinaryKey(f.fn(v))
 }
 
-func (f *BinaryField[V]) field() {}
+func (f *BinaryIndex[V]) field() {}
 
-func (f *BinaryField[V]) Is(v []byte) *EqualCond[V] {
+func (f *BinaryIndex[V]) Is(v []byte) *EqualCond[V] {
 	return &EqualCond[V]{f, BinaryKey(v)}
 }
 
-func (f *BinaryField[V]) LessThan(v []byte) *LessThanCond[V] {
+func (f *BinaryIndex[V]) LessThan(v []byte) *LessThanCond[V] {
 	return &LessThanCond[V]{f, BinaryKey(v)}
 }
 
-func (f *BinaryField[V]) LessThanOrEqual(v []byte) *LessThanOrEqualCond[V] {
+func (f *BinaryIndex[V]) LessThanOrEqual(v []byte) *LessThanOrEqualCond[V] {
 	return &LessThanOrEqualCond[V]{f, BinaryKey(v)}
 }
 
-func (f *BinaryField[V]) GreaterThan(v []byte) *GreaterThanCond[V] {
+func (f *BinaryIndex[V]) GreaterThan(v []byte) *GreaterThanCond[V] {
 	return &GreaterThanCond[V]{f, BinaryKey(v)}
 }
 
-func (f *BinaryField[V]) GreaterThanOrEqual(v []byte) *GreaterThanOrEqualCond[V] {
+func (f *BinaryIndex[V]) GreaterThanOrEqual(v []byte) *GreaterThanOrEqualCond[V] {
 	return &GreaterThanOrEqualCond[V]{f, BinaryKey(v)}
 }
 
-type MultiField[V any] struct {
-	fn func(v V) MultiKey
+type CombinedIndex[V any] struct {
+	fn func(v V) CombinedKey
 }
 
-func (f *MultiField[V]) KeyOf(v V) Key {
+func (f *CombinedIndex[V]) KeyOf(v V) Key {
 	return f.fn(v)
 }
 
-func (f *MultiField[V]) field() {}
+func (f *CombinedIndex[V]) field() {}
 
-func (f *MultiField[V]) Is(k MultiKey) *EqualCond[V] {
+func (f *CombinedIndex[V]) Is(k CombinedKey) *EqualCond[V] {
 	return &EqualCond[V]{f, k}
 }
 

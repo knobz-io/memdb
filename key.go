@@ -48,9 +48,9 @@ func (b BinaryKey) Bytes() []byte {
 	return b
 }
 
-type MultiKey []Key
+type CombinedKey []Key
 
-func (mk MultiKey) Bytes() []byte {
+func (mk CombinedKey) Bytes() []byte {
 	dst := [][]byte{}
 	for _, k := range mk {
 		dst = append(dst, k.Bytes())
