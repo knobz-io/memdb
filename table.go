@@ -171,7 +171,7 @@ func (t Table[V]) Del(tx *Txn, pk Key) error {
 	return nil
 }
 
-func (t Table[V]) List(tx *Txn) *TableLister[V] {
+func (t Table[V]) Select(tx *Txn) *TableLister[V] {
 	return &TableLister[V]{
 		table: t,
 		tx:    tx,

@@ -32,13 +32,13 @@ func (t *TableLister[V]) Where(conds ...Cond[V]) *TableLister[V] {
 	return t
 }
 
-func (t *TableLister[V]) Count() int {
-	return t.selector().count()
+func (t *TableLister[V]) Count() (int, error) {
+	return t.selector().count(), nil
 }
 
-func (t *TableLister[V]) Page(limit, offset int) []V {
+func (t *TableLister[V]) Page(limit, offset int) ([]V, error) {
 	selector := t.selector()
-	return selector.page(limit, offset)
+	return selector.page(limit, offset), nil
 }
 
 func (t *TableLister[V]) One() (V, error) {
