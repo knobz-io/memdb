@@ -24,7 +24,7 @@ func NewTable[V any](fn KeyFunc[V]) Table[V] {
 		ref: new(V),
 		fn:  fn,
 		idxm: IndexMap[V]{
-			m: make(map[Field[V]]int),
+			m: make(map[Index[V]]int),
 		},
 	}
 }
@@ -222,7 +222,7 @@ func (t Table[V]) registerTable(db *DB) error {
 	return nil
 }
 
-func (t Table[V]) registerIndex(f Field[V]) Table[V] {
+func (t Table[V]) registerIndex(f Index[V]) Table[V] {
 	i := t.idxm.m[f]
 	t.cb.setfn = append(t.cb.setfn, func(tx *Txn, v V) {
 		idx := (*treeTxn[*tree[struct{}]])(tx.tm[t.ref][uint8(i+1)])
@@ -246,7 +246,7 @@ func (t Table[V]) registerIndex(f Field[V]) Table[V] {
 		}
 		subtx := subidx.txn(true)
 		subtx.del(id.Bytes())
-		if subtx.root.height() == 0 {
+		if subtx.root == nil {
 			idx.del(k.Bytes())
 		} else {
 			idx.set(k.Bytes(), subtx.commit())

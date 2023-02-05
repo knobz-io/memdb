@@ -8,11 +8,11 @@ type TableLister[V any] struct {
 	table Table[V]
 	tx    *Txn
 	conds []Cond[V]
-	order Field[V]
+	order Index[V]
 	dir   OrderDirection
 }
 
-func (t *TableLister[V]) OrderBy(order Field[V]) *TableLister[V] {
+func (t *TableLister[V]) OrderBy(order Index[V]) *TableLister[V] {
 	t.order = order
 	return t
 }
@@ -39,6 +39,11 @@ func (t *TableLister[V]) Count() (int, error) {
 func (t *TableLister[V]) Page(limit, offset int) ([]V, error) {
 	selector := t.selector()
 	return selector.page(limit, offset), nil
+}
+
+func (t *TableLister[V]) All() ([]V, error) {
+	selector := t.selector()
+	return selector.page(0, 0), nil
 }
 
 func (t *TableLister[V]) One() (V, error) {
@@ -72,10 +77,9 @@ func (t *TableLister[V]) selector() *TableSelection[V] {
 			switch cnd := cnd.(type) {
 			case *EqualCond[V]:
 				subidx, ok := idx.get(cnd.key.Bytes())
-				if !ok {
-					return &TableSelection[V]{}
+				if ok {
+					tmp = subidx
 				}
-				tmp = subidx
 			case *LessThanCond[V]:
 				c := idx.cursor()
 				k := cnd.key.Bytes()

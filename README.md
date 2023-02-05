@@ -37,7 +37,7 @@ To start using memdb, you'll need to first create a table schema for your data m
 In order to use memdb, you'll need to define your data models in Go. These will be the types that you'll store in the database. For example, you could have a `User` struct like this:
 
 ```go
-type UserStatus int
+type Status int
 
 const (
     Active Status = iota
@@ -56,40 +56,41 @@ type User struct {
 Once you have your data models defined, you can create a table schema for them using the `memdb.Table[V]` struct. The schema will specify how the data is stored in the database, and will define any indexes that you want to create on it. For example, you could create a `UserTable` schema like this::
 
 ```go
+
 type UserTable struct {
-    memdb.Table[*User]
-    // indexes
-    status   *memdb.IntIndex[*User]
-    email    *memdb.StringIndex[*User]
-    fullName *memdb.StringIndex[*User]
+	memdb.Table[*User]
+	// indexes
+	status   *memdb.IntIndex[*User]
+	email    *memdb.StringIndex[*User]
+	fullName *memdb.StringIndex[*User]
 }
 
-// ID is a helper function for preparing 
+// ID is a helper function for preparing
 // user primary key from int
 func (UserTable) ID(id int) memdb.Key {
-    return memdb.IntKey(id)
+	return memdb.IntKey(id)
 }
 
 func makeUserTable() UserTable {
-    table := memdb.NewTable(func(usr *User) memdb.Key {
-        return memdb.IntKey(usr.ID)
-    })
-    // preparing indexes
-    table, status := memdb.IndexInt(func(usr *User) {
-        return usr.Status
-    })
-    table, email := memdb.IndexString(func(usr *User) {
-        return usr.Email
-    })
-    table, fullName := memdb.IndexString(func(usr *User) {
-        return usr.FullName
-    })
-    return UserTable{
-        Table:         Table,
-        status:        status,
-        email:         email,
-        fullName:      fullName,
-    }
+	table := memdb.NewTable(func(usr *User) memdb.Key {
+		return memdb.IntKey(usr.ID)
+	})
+	// preparing indexes
+	table, status := table.IndexInt(func(usr *User) int {
+		return int(usr.Status)
+	})
+	table, email := table.IndexString(func(usr *User) string {
+		return usr.Email
+	})
+	table, fullName := table.IndexString(func(usr *User) string {
+		return usr.FullName
+	})
+	return UserTable{
+		Table:    table,
+		status:   status,
+		email:    email,
+		fullName: fullName,
+	}
 }
 ```
 
@@ -119,18 +120,24 @@ users.Set(tx, &User{
 })
 
 // or insert multiple entires
-users.SetMulti(tx, []*Users{
-    {
-        ID:       1,
-        Status:   Active,
-        Email:    "john.doe@example.com",
-        FullName: "John Doe",
-    },
+users.SetMulti(tx, []*User{
     {
         ID:       2,
         Status:   Active,
+        Email:    "david.rich@example.com",
+        FullName: "David Rich",
+    },
+    {
+        ID:       3,
+        Status:   Suspended,
         Email:    "matt.smith@example.com",
         FullName: "Matt Smith",
+    },
+    {
+        ID:       4,
+        Status:   Active,
+        Email:    "jack.thompson@example.com",
+        FullName: "Jack Thompson",
     },
 })
 
@@ -150,7 +157,7 @@ tx := db.WriteTx()
 err := users.Del(tx, users.ID(1))
 
 // or delete multiple entries where ID=1, ID=2
-err := users.DelMulti(tx, []users.Key{
+err := users.DelMulti(tx, []memdb.Key{
     users.ID(1),
     users.ID(2),
 })
@@ -166,8 +173,8 @@ To retrieve a specific entry from the table using its primary key, you'll need t
 ```go
 // start read-only transaction
 tx := db.ReadTx()
-// retrieving entry with ID=1
-usr, err := users.Get(tx, users.ID(1))
+// retrieving entry with ID=3
+usr, err := users.Get(tx, users.ID(3))
 if err == memdb.ErrNotFound {
     // handle not found
 } else if err != nil {
@@ -210,7 +217,7 @@ if err != nil {
     panic(err)
 }
 // iterate over table entries
-for usr, ok := c.First(); ok; usr. ok = c.Next() {
+for usr, ok := c.First(); ok; usr, ok = c.Next() {
     fmt.Println("id:", usr.ID, "email:", usr.Email)
 }
 ```
@@ -228,7 +235,7 @@ tx := db.ReadTx()
 // filter all entries where Status=Active
 list, err := users.Select(tx).
     Where(
-        users.status.Is(Active),
+        users.status.Is(int(Active)),
     ).
     All()
 ```
@@ -261,27 +268,6 @@ list, err := users.Select(tx).
 ```
 
 This will sort the query results by the `FullName` property in ascending order, then if two or more entries have the same `FullName` it will sort them by the `Email` property in descending order.
-
-### Pagination
-
-To retrieve a specific page of entries from the table based on certain conditions, you can use the `Page` method on the table schema to create a query, and then use the `limit` and `offset` as arguments to specify the pagination.
-
-```go
-// page details
-limit := 10
-offset := 0
-
-// start read-only transaction
-tx := db.ReadTx()
-list, err := users.Select(tx).
-    Where(
-        users.status.Is(Active),
-    ).
-    OrderBy(users.fullName.Asc()).
-    Page(limit, offset) 
-```
-
-
 
 For more information on how to use memdb, please refer to the [Godoc](https://pkg.go.dev/github.com/knobz-io/memdb).
 

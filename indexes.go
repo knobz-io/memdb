@@ -3,25 +3,39 @@ package memdb
 import "bytes"
 
 type IndexMap[V any] struct {
-	arr []Field[V]
-	m   map[Field[V]]int
+	arr []Index[V]
+	m   map[Index[V]]int
 	n   int
 }
 
-func (f IndexMap[V]) add(ff Field[V]) IndexMap[V] {
+func (f IndexMap[V]) add(ff Index[V]) IndexMap[V] {
 	f.arr = append(f.arr, ff)
 	f.m[ff] = f.n
 	f.n++
 	return f
 }
 
-type Field[V any] interface {
+type Index[V any] interface {
 	KeyOf(v V) Key
 	field()
 }
 
 type StringIndex[V any] struct {
 	fn func(v V) string
+}
+
+func (f *StringIndex[V]) Asc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Asc,
+	}
+}
+
+func (f *StringIndex[V]) Desc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Desc,
+	}
 }
 
 func (f *StringIndex[V]) Is(v string) *EqualCond[V] {
@@ -58,6 +72,20 @@ func (f *IntIndex[V]) KeyOf(v V) Key {
 	return IntKey(f.fn(v))
 }
 
+func (f *IntIndex[V]) Asc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Asc,
+	}
+}
+
+func (f *IntIndex[V]) Desc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Desc,
+	}
+}
+
 func (f *IntIndex[V]) field() {}
 
 func (f *IntIndex[V]) Is(v int) *EqualCond[V] {
@@ -86,6 +114,20 @@ type FloatIndex[V any] struct {
 
 func (f *FloatIndex[V]) KeyOf(v V) Key {
 	return FloatKey(f.fn(v))
+}
+
+func (f *FloatIndex[V]) Asc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Asc,
+	}
+}
+
+func (f *FloatIndex[V]) Desc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Desc,
+	}
 }
 
 func (f *FloatIndex[V]) Is(v float64) *EqualCond[V] {
@@ -132,6 +174,20 @@ type BinaryIndex[V any] struct {
 	fn func(v V) []byte
 }
 
+func (f *BinaryIndex[V]) Asc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Asc,
+	}
+}
+
+func (f *BinaryIndex[V]) Desc() *OrderRule[V] {
+	return &OrderRule[V]{
+		index: f,
+		dir:   Desc,
+	}
+}
+
 func (f *BinaryIndex[V]) KeyOf(v V) Key {
 	return BinaryKey(f.fn(v))
 }
@@ -173,17 +229,17 @@ func (f *CombinedIndex[V]) Is(k CombinedKey) *EqualCond[V] {
 }
 
 type indexCond[V any] interface {
-	field() Field[V]
+	field() Index[V]
 	matches(k []byte) bool
 	Matches(v V) bool
 }
 
 type EqualCond[V any] struct {
-	f   Field[V]
+	f   Index[V]
 	key Key
 }
 
-func (c *EqualCond[V]) field() Field[V] {
+func (c *EqualCond[V]) field() Index[V] {
 	return c.f
 }
 
@@ -196,11 +252,11 @@ func (c *EqualCond[V]) Matches(v V) bool {
 }
 
 type LessThanCond[V any] struct {
-	f   Field[V]
+	f   Index[V]
 	key Key
 }
 
-func (c *LessThanCond[V]) field() Field[V] {
+func (c *LessThanCond[V]) field() Index[V] {
 	return c.f
 }
 
@@ -213,11 +269,11 @@ func (c *LessThanCond[V]) matches(k []byte) bool {
 }
 
 type LessThanOrEqualCond[V any] struct {
-	f   Field[V]
+	f   Index[V]
 	key Key
 }
 
-func (c *LessThanOrEqualCond[V]) field() Field[V] {
+func (c *LessThanOrEqualCond[V]) field() Index[V] {
 	return c.f
 }
 
@@ -230,11 +286,11 @@ func (c *LessThanOrEqualCond[V]) Matches(v V) bool {
 }
 
 type GreaterThanCond[V any] struct {
-	f   Field[V]
+	f   Index[V]
 	key Key
 }
 
-func (c *GreaterThanCond[V]) field() Field[V] {
+func (c *GreaterThanCond[V]) field() Index[V] {
 	return c.f
 }
 
@@ -247,11 +303,11 @@ func (c *GreaterThanCond[V]) matches(k []byte) bool {
 }
 
 type GreaterThanOrEqualCond[V any] struct {
-	f   Field[V]
+	f   Index[V]
 	key Key
 }
 
-func (c *GreaterThanOrEqualCond[V]) field() Field[V] {
+func (c *GreaterThanOrEqualCond[V]) field() Index[V] {
 	return c.f
 }
 
